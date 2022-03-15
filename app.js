@@ -27,17 +27,19 @@ const server = http.createServer((req,res)=>{
             body.push(chunk);
         })
 
-        req.on('end', ()=>{
+        return req.on('end', ()=>{
             //this will run ones it is done parsing the incoming reqst
             // to work with the chunk we have to buffer them
             const parsedBody = Buffer.concat(body).toString();
             // console.log(parsedBody);
             const message = parsedBody.split('=')[1]
-            fs.writeFileSync('message.txt', message)
+            fs.writeFile('message.txt', message, err=>{
+                //it will run when it is done working on the file
+                res.statusCode = 302;
+                res.setHeader('Location', '/');
+                return res.end();
+            })
         })
-        res.statusCode = 302;
-        res.setHeader('Location', '/');
-        return res.end();
 
     }
     res.setHeader('Content-Type', 'text/html');
